@@ -8,6 +8,7 @@ use App\Livewire\Member\MyNetwork;
 use App\Livewire\Member\Opportunities;
 use App\Livewire\Member\Payments;
 use App\Livewire\Member\Profile;
+use App\Livewire\Member\Trainings;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -43,6 +44,7 @@ Route::middleware(['auth', 'membre'])
         Route::get('/annuaire',     Directory::class)->name('directory');
         Route::get('/opportunites', Opportunities::class)->name('opportunities');
         Route::get('/evenements',   Events::class)->name('events');
+        Route::get('/formations',   Trainings::class)->name('trainings');
         Route::get('/paiements',    Payments::class)->name('payments');
         Route::get('/mon-reseau',   MyNetwork::class)->name('network');
     });

@@ -44,4 +44,22 @@ class TrainingSession extends Model
     {
         return $this->enrollments()->where('status', 'attended')->count();
     }
+
+    public function isFull(): bool
+    {
+        $capacity = $this->training->capacity ?? null;
+        if ($capacity === null) {
+            return false;
+        }
+        return $this->enrollments()->count() >= $capacity;
+    }
+
+    public function spotsLeft(): ?int
+    {
+        $capacity = $this->training->capacity ?? null;
+        if ($capacity === null) {
+            return null;
+        }
+        return max(0, $capacity - $this->enrollments()->count());
+    }
 }

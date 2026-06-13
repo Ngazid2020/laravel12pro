@@ -64,6 +64,7 @@
             <x-menu-separator />
 
             <x-menu-item title="Opportunités" icon="o-briefcase" :link="route('membre.opportunities')" />
+            <x-menu-item title="Formations" icon="o-book-open" :link="route('membre.trainings')" />
             <x-menu-item title="Événements" icon="o-calendar-days" :link="route('membre.events')" />
 
             <x-menu-separator />
@@ -85,10 +86,14 @@
                 @endif
             @endauth
 
-            <form method="POST" action="{{ route('logout') }}">
+            <form id="logout-form" method="POST" action="{{ route('logout') }}">
                 @csrf
-                <x-menu-item title="Déconnexion" icon="o-arrow-right-start-on-rectangle" type="submit" />
             </form>
+            <x-menu-item
+                title="Déconnexion"
+                icon="o-arrow-right-start-on-rectangle"
+                x-on:click.prevent="document.getElementById('logout-form').submit()"
+            />
         </x-menu>
     </x-slot:sidebar>
 
