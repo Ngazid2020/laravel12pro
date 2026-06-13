@@ -69,7 +69,14 @@
 
             <x-menu-separator />
 
+            <x-menu-item title="Recommandations" icon="o-arrow-path-rounded-square" :link="route('membre.recommendations')" />
+            <x-menu-item title="Mise en relation" icon="o-user-plus" :link="route('membre.contacts')" />
+
+            <x-menu-separator />
+
             <x-menu-item title="Mes paiements" icon="o-banknotes" :link="route('membre.payments')" />
+            <x-menu-item title="Mentorat" icon="o-academic-cap" :link="route('membre.mentoring')" />
+            <x-menu-item title="Ma progression" icon="o-trophy" :link="route('membre.progress')" />
 
             @auth
                 @if(auth()->user()->profile?->directMentees()->exists())
