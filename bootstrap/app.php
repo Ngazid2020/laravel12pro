@@ -14,6 +14,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'membre' => \App\Http\Middleware\EnsureActiveMember::class,
         ]);
+        $middleware->redirectGuestsTo(fn () => route('member.login'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
