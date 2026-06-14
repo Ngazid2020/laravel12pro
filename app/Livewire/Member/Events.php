@@ -4,6 +4,8 @@ namespace App\Livewire\Member;
 
 use App\Models\Event;
 use App\Models\EventRegistration;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\URL;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -18,6 +20,11 @@ class Events extends Component
 
     public string $filter = 'upcoming'; // upcoming | past
 
+    // QR code modal
+    public bool   $showQr          = false;
+    public ?string $qrUrl          = null;
+    public ?string $qrEventTitle   = null;
+
     public function register(int $eventId): void
     {
         $event = Event::findOrFail($eventId);
@@ -28,7 +35,7 @@ class Events extends Component
         }
 
         $exists = EventRegistration::where('event_id', $eventId)
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->exists();
 
         if ($exists) {
@@ -38,7 +45,7 @@ class Events extends Component
 
         EventRegistration::create([
             'event_id' => $eventId,
-            'user_id'  => auth()->id(),
+            'user_id'  => Auth::id(),
         ]);
 
         $this->success('Inscription confirmée !');
@@ -47,10 +54,22 @@ class Events extends Component
     public function unregister(int $eventId): void
     {
         EventRegistration::where('event_id', $eventId)
-            ->where('user_id', auth()->id())
+            ->where('user_id', Auth::id())
             ->delete();
 
         $this->success('Inscription annulée.');
+    }
+
+    public function showQrCode(int $registrationId): void
+    {
+        $registration = EventRegistration::with('event')
+            ->where('id', $registrationId)
+            ->where('user_id', Auth::id())
+            ->firstOrFail();
+
+        $this->qrUrl        = URL::signedRoute('event.checkin', ['registration' => $registration->id]);
+        $this->qrEventTitle = $registration->event->title;
+        $this->showQr       = true;
     }
 
     public function render()
@@ -65,8 +84,9 @@ class Events extends Component
 
         $events = $query->paginate(8);
 
-        $myRegistrations = EventRegistration::where('user_id', auth()->id())
-            ->pluck('event_id')
+        // Map event_id => registration_id pour les inscrits
+        $myRegistrations = EventRegistration::where('user_id', Auth::id())
+            ->pluck('id', 'event_id')
             ->toArray();
 
         $typeLabels = [

@@ -39,10 +39,16 @@
                 />
             </x-slot:actions>
         </x-form>
+
+        <div class="text-center mt-3">
+            <a href="{{ route('password.request') }}" class="text-sm link link-primary">
+                Mot de passe oublié ?
+            </a>
+        </div>
     </x-card>
 
     <p class="text-center text-sm text-base-content/50 mt-6">
         Pas encore membre ?
-        <span class="font-medium text-primary">Contactez l'administration pour soumettre votre candidature.</span>
+        <a href="{{ route('home') }}" class="font-medium text-primary link">Postuler sur la vitrine →</a>
     </p>
 </div>

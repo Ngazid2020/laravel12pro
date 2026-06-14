@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PaymentResource\Pages;
+use App\Mail\PaymentValidatedMail;
 use App\Models\Payment;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -10,6 +11,8 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 
 class PaymentResource extends Resource
 {
@@ -180,17 +183,18 @@ class PaymentResource extends Resource
                     ->action(function ($record) {
                         $record->update([
                             'status'       => 'validated',
-                            'validated_by' => auth()->id(),
+                            'validated_by' => Auth::id(),
                             'validated_at' => now(),
                         ]);
-                        // Mise à jour du profil membre
                         if ($record->period_end) {
                             $record->user->profile?->update([
                                 'membership_status'    => 'active',
                                 'membership_expires_at'=> $record->period_end,
                             ]);
                         }
-                        Notification::make()->title('Paiement validé')->success()->send();
+                        Mail::to($record->user->email)
+                            ->queue(new PaymentValidatedMail($record));
+                        Notification::make()->title('Paiement validé — reçu envoyé par email')->success()->send();
                     }),
                 Tables\Actions\Action::make('reject')
                     ->label('Refuser')
@@ -205,12 +209,19 @@ class PaymentResource extends Resource
                     ->action(function ($record, array $data) {
                         $record->update([
                             'status'       => 'rejected',
-                            'validated_by' => auth()->id(),
+                            'validated_by' => Auth::id(),
                             'validated_at' => now(),
                             'notes'        => $data['notes'],
                         ]);
                         Notification::make()->title('Paiement refusé')->warning()->send();
                     }),
+                Tables\Actions\Action::make('receipt')
+                    ->label('Reçu PDF')
+                    ->icon('heroicon-o-document-arrow-down')
+                    ->color('gray')
+                    ->visible(fn ($record) => $record->status === 'validated')
+                    ->url(fn ($record) => route('payment.receipt', $record))
+                    ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
             ])
             ->defaultSort('created_at', 'desc');

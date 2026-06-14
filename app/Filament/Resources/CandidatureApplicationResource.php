@@ -3,16 +3,18 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\CandidatureApplicationResource\Pages;
+use App\Mail\CandidatureAcceptedMail;
 use App\Models\CandidatureApplication;
 use App\Models\MemberProfile;
-use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 
 class CandidatureApplicationResource extends Resource
 {
@@ -130,7 +132,7 @@ class CandidatureApplicationResource extends Resource
                     ->action(function ($record) {
                         $record->update([
                             'status'      => 'accepted',
-                            'reviewed_by' => auth()->id(),
+                            'reviewed_by' => Auth::id(),
                             'reviewed_at' => now(),
                         ]);
                         // Crée ou active le profil membre
@@ -141,8 +143,17 @@ class CandidatureApplicationResource extends Resource
                                 'activated_at'      => now(),
                             ]
                         );
+                        // Générer le lien de définition du mot de passe (valable 60 min)
+                        $token    = Password::broker()->createToken($record->user);
+                        $setupUrl = route('password.reset', [
+                            'token' => $token,
+                            'email' => $record->user->email,
+                        ]);
+
+                        Mail::to($record->user->email)
+                            ->queue(new CandidatureAcceptedMail($record, $setupUrl));
                         Notification::make()
-                            ->title('Candidature acceptée')
+                            ->title('Candidature acceptée — email envoyé')
                             ->success()
                             ->send();
                     }),
@@ -160,7 +171,7 @@ class CandidatureApplicationResource extends Resource
                     ->action(function ($record, array $data) {
                         $record->update([
                             'status'           => 'rejected',
-                            'reviewed_by'      => auth()->id(),
+                            'reviewed_by'      => Auth::id(),
                             'reviewed_at'      => now(),
                             'rejection_reason' => $data['rejection_reason'],
                         ]);
@@ -176,7 +187,7 @@ class CandidatureApplicationResource extends Resource
                     ->visible(fn ($record) => $record->status === 'pending')
                     ->action(fn ($record) => $record->update([
                         'status'      => 'on_hold',
-                        'reviewed_by' => auth()->id(),
+                        'reviewed_by' => Auth::id(),
                         'reviewed_at' => now(),
                     ])),
                 Tables\Actions\EditAction::make(),
