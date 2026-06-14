@@ -88,6 +88,14 @@ class Trainings extends Component
 
     public function openRating(int $enrollmentId): void
     {
+        $enrollment = TrainingEnrollment::where('id', $enrollmentId)
+            ->where('user_id', Auth::id())
+            ->first();
+
+        if (! $enrollment) {
+            return;
+        }
+
         $this->ratingEnrollmentId = $enrollmentId;
         $this->rating             = 5;
         $this->ratingComment      = '';

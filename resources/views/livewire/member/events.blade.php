@@ -82,7 +82,7 @@
                         @elseif(!$event->isFull())
                             <x-button
                                 label="S'inscrire"
-                                icon="o-calendar-plus"
+                                icon="o-calendar"
                                 class="btn-primary btn-sm"
                                 wire:click="register({{ $event->id }})"
                             />

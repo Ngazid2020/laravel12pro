@@ -27,7 +27,12 @@ class Events extends Component
 
     public function register(int $eventId): void
     {
-        $event = Event::findOrFail($eventId);
+        $event = Event::where('id', $eventId)->where('is_published', true)->first();
+
+        if (! $event) {
+            $this->warning('Cet événement n\'est pas disponible.');
+            return;
+        }
 
         if ($event->isFull()) {
             $this->warning('Cet événement est complet.');
@@ -65,7 +70,11 @@ class Events extends Component
         $registration = EventRegistration::with('event')
             ->where('id', $registrationId)
             ->where('user_id', Auth::id())
-            ->firstOrFail();
+            ->first();
+
+        if (! $registration) {
+            return;
+        }
 
         $this->qrUrl        = URL::signedRoute('event.checkin', ['registration' => $registration->id]);
         $this->qrEventTitle = $registration->event->title;
