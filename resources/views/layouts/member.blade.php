@@ -88,7 +88,7 @@
 
             @auth
                 @if(auth()->user()->hasRole(['super_admin', 'admin']))
-                    <x-menu-item title="Back-office" icon="o-shield-check" link="/admin" class="text-warning" />
+                    <x-menu-item title="Back-office" icon="o-shield-check" link="/admin" class="text-warning" no-wire-navigate />
                     <x-menu-separator />
                 @endif
             @endauth

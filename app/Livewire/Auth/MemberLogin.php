@@ -34,7 +34,7 @@ class MemberLogin extends Component
         $user = Auth::user();
 
         if ($user->hasRole(['super_admin', 'admin'])) {
-            $this->redirect('/admin', navigate: true);
+            $this->redirect('/admin', navigate: false);
             return;
         }
 
