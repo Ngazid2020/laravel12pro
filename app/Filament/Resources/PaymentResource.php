@@ -80,7 +80,9 @@ class PaymentResource extends Resource
                     Forms\Components\FileUpload::make('screenshot_path')
                         ->label('Capture d\'écran')
                         ->image()
-                        ->directory('payment-screenshots'),
+                        ->disk('local')
+                        ->directory('payment-screenshots')
+                        ->visibility('private'),
                 ]),
             Forms\Components\Section::make('Détails Chèque')
                 ->visible(fn (Forms\Get $get) => $get('method') === 'cheque')
@@ -215,6 +217,13 @@ class PaymentResource extends Resource
                         ]);
                         Notification::make()->title('Paiement refusé')->warning()->send();
                     }),
+                Tables\Actions\Action::make('screenshot')
+                    ->label('Justificatif')
+                    ->icon('heroicon-o-photo')
+                    ->color('gray')
+                    ->visible(fn ($record) => (bool) $record->screenshot_path)
+                    ->url(fn ($record) => route('payment.screenshot', $record))
+                    ->openUrlInNewTab(),
                 Tables\Actions\Action::make('receipt')
                     ->label('Reçu PDF')
                     ->icon('heroicon-o-document-arrow-down')

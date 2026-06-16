@@ -91,10 +91,10 @@ class PaymentController extends Controller
         ]);
 
         if ($payment->screenshot_path) {
-            Storage::disk('public')->delete($payment->screenshot_path);
+            Storage::disk('local')->delete($payment->screenshot_path);
         }
 
-        $path = $request->file('screenshot')->store('payment-screenshots', 'public');
+        $path = $request->file('screenshot')->store('payment-screenshots', 'local');
         $payment->update(['screenshot_path' => $path]);
 
         return response()->json(['message' => 'Justificatif uploadé.']);

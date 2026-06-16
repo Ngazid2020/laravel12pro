@@ -50,7 +50,8 @@ return [
     |
     */
 
-    'expiration' => null,
+    // Tokens expirés après 30 jours — forcer une re-connexion mensuelle
+    'expiration' => 60 * 24 * 30,
 
     /*
     |--------------------------------------------------------------------------

@@ -32,7 +32,6 @@ class EnsureActiveMemberApi
         }
 
         if ($profile->membership_status === 'suspended') {
-            // En API, on retourne un JSON avec les détails plutôt qu'une redirection
             return response()->json([
                 'message'  => 'Votre compte est suspendu. Veuillez régulariser votre cotisation.',
                 'code'     => 'ACCOUNT_SUSPENDED',
@@ -40,8 +39,17 @@ class EnsureActiveMemberApi
             ], 403);
         }
 
-        if (! $profile->isActive()) {
-            return response()->json(['message' => 'Votre adhésion a expiré.'], 403);
+        // Cotisation expirée même si le statut est encore "active"
+        $expired = $profile->membership_status === 'active'
+            && $profile->membership_expires_at !== null
+            && $profile->membership_expires_at->isPast();
+
+        if ($expired) {
+            return response()->json([
+                'message'  => 'Votre adhésion a expiré. Régularisez votre cotisation.',
+                'code'     => 'MEMBERSHIP_EXPIRED',
+                'redirect' => 'payments',
+            ], 403);
         }
 
         return $next($request);

@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\TrainingResource\Pages;
+use App\Filament\Resources\TrainingResource\RelationManagers\TrainingSessionsRelationManager;
 use App\Models\Training;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -132,7 +133,9 @@ class TrainingResource extends Resource
 
     public static function getRelations(): array
     {
-        return [];
+        return [
+            TrainingSessionsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

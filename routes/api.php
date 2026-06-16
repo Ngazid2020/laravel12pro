@@ -20,7 +20,9 @@ use Illuminate\Support\Facades\Route;
 */
 
 // ── Authentification (public) ─────────────────────────────────────────────
-Route::post('auth/login',  [AuthController::class, 'login'])->name('api.auth.login');
+Route::post('auth/login', [AuthController::class, 'login'])
+    ->middleware('throttle:api-login')
+    ->name('api.auth.login');
 
 Route::middleware('auth:sanctum')->group(function () {
 

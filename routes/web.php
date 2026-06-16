@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\EventCheckInController;
+use App\Http\Controllers\PaymentScreenshotController;
 use App\Http\Controllers\ReceiptController;
 use App\Livewire\Auth\ForgotPassword;
 use App\Livewire\Auth\MemberLogin;
@@ -75,4 +76,7 @@ Route::middleware(['auth', 'membre'])
 
         // Téléchargement du reçu PDF
         Route::get('/paiements/{payment}/recu', ReceiptController::class)->name('payment.receipt');
+
+        // Justificatif de paiement (stockage privé — auth requise)
+        Route::get('/paiements/{payment}/justificatif', PaymentScreenshotController::class)->name('payment.screenshot');
     });

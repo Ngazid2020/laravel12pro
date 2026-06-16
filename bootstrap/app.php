@@ -17,8 +17,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'membre'      => \App\Http\Middleware\EnsureActiveMember::class,
             'membre.api'  => \App\Http\Middleware\EnsureActiveMemberApi::class,
         ]);
+
+        // En-têtes de sécurité sur toutes les requêtes
+        $middleware->append(\App\Http\Middleware\AddSecurityHeaders::class);
         $middleware->redirectGuestsTo(fn () => route('member.login'));
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $e): void {
         //
     })->create();
