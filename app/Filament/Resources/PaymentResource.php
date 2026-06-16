@@ -222,14 +222,14 @@ class PaymentResource extends Resource
                     ->icon('heroicon-o-photo')
                     ->color('gray')
                     ->visible(fn ($record) => (bool) $record->screenshot_path)
-                    ->url(fn ($record) => route('payment.screenshot', $record))
+                    ->url(fn ($record) => route('membre.payment.screenshot', $record))
                     ->openUrlInNewTab(),
                 Tables\Actions\Action::make('receipt')
                     ->label('Reçu PDF')
                     ->icon('heroicon-o-document-arrow-down')
                     ->color('gray')
                     ->visible(fn ($record) => $record->status === 'validated')
-                    ->url(fn ($record) => route('payment.receipt', $record))
+                    ->url(fn ($record) => route('membre.payment.receipt', $record))
                     ->openUrlInNewTab(),
                 Tables\Actions\EditAction::make(),
             ])
