@@ -11,6 +11,9 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
+        // Commande complète après migrate:fresh :
+        //   php artisan migrate:fresh --seed
+        // Cela crée : rôles (super_admin, admin), permissions Shield, user admin@reseau.km
         $this->call([
             ShieldSeeder::class,
             SuperAdminSeeder::class,
