@@ -19,6 +19,7 @@ use App\Livewire\Member\Progress;
 use App\Livewire\Member\Recommendations;
 use App\Livewire\Member\Trainings;
 use App\Livewire\Public\Home;
+use App\Livewire\Public\Rgpd;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -26,6 +27,7 @@ use Illuminate\Support\Facades\Route;
 // VITRINE PUBLIQUE
 // -----------------------------------------------
 Route::get('/', Home::class)->name('home')->middleware('guest');
+Route::get('/politique-de-confidentialite', Rgpd::class)->name('rgpd');
 
 // Redirige les utilisateurs connectés depuis la racine
 Route::get('/portail', function () {
