@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             ShieldSeeder::class,
             SuperAdminSeeder::class,
             TestMemberSeeder::class,
+            DemoSeeder::class,
         ]);
     }
 }
