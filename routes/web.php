@@ -26,7 +26,7 @@ use Illuminate\Support\Facades\Route;
 // -----------------------------------------------
 // VITRINE PUBLIQUE
 // -----------------------------------------------
-Route::get('/', Home::class)->name('home')->middleware('guest');
+Route::get('/', Home::class)->name('home');
 Route::get('/politique-de-confidentialite', Rgpd::class)->name('rgpd');
 
 // Redirige les utilisateurs connectés depuis la racine

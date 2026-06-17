@@ -7,6 +7,7 @@ use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
+use Filament\Navigation\MenuItem;
 use Filament\Navigation\NavigationGroup;
 use Filament\Pages;
 use Filament\Panel;
@@ -41,6 +42,13 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 // Widgets\AccountWidget::class,
+            ])
+            ->userMenuItems([
+                MenuItem::make()
+                    ->label('Retour au site')
+                    ->url('/')
+                    ->icon('heroicon-o-home')
+                    ->sort(1),
             ])
             ->navigationGroups([
                 NavigationGroup::make('Membres'),

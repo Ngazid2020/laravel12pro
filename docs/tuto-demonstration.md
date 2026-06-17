@@ -3,6 +3,9 @@
 > Scénario complet de A à Z · Durée estimée : 20–30 minutes  
 > Prérequis : serveur démarré (`composer dev`), base de données fraîche (`php artisan migrate:fresh --seed`)
 
+> **v1.2** — Données de démonstration pré-remplies (12 membres, événements, formations, opportunités)  
+> Membres démo : `prenom.nom@reseau.km` / `Demo@2026!` (ex : `fatima.ahamada@reseau.km`)
+
 ---
 
 ## Personnages du scénario
@@ -335,6 +338,134 @@ Puisqu'on est en développement, les emails sont enregistrés dans les logs.
 
 ---
 
+---
+
+## PARTIE 9 — Données de démonstration pré-remplies
+
+> Cette partie ne fait pas partie du scénario Fatouma — c'est la présentation des données pré-chargées disponibles dès `migrate:fresh --seed`.
+
+### Vue d'ensemble des données démo
+
+| Catégorie | Contenu |
+|---|---|
+| Membres | 12 membres (10 actifs, 1 suspendu, 1 candidat) |
+| Plans de cotisation | 2 plans : mensuel 1 500 KMF, annuel 15 000 KMF |
+| Niveaux | 5 niveaux : Débutant → Junior → Confirmé → Expert → Champion |
+| Entreprises partenaires | 3 sociétés (finances, conseil, distribution) |
+| Événements | 4 événements (2 passés avec check-ins, 2 à venir) |
+| Formations | 3 formations avec sessions planifiées |
+| Opportunités | 4 opportunités (appels d'offres, missions, financement) |
+| Annonces | 3 annonces actives |
+| Sessions de mentorat | 7 sessions planifiées entre membres |
+| Demandes de contact | 5 demandes entre membres |
+
+### Connexion aux membres démo
+
+Tous les membres démo partagent le même mot de passe : **`Demo@2026!`**
+
+| Prénom Nom | Email |
+|---|---|
+| Fatima Ahamada | fatima.ahamada@reseau.km |
+| Mohamed Said | mohamed.said@reseau.km |
+| Aisha Ibrahim | aisha.ibrahim@reseau.km |
+| Karim Hassani | karim.hassani@reseau.km |
+| Zoubaïda Omar | zoubaida.omar@reseau.km |
+| Hassan Madi | hassan.madi@reseau.km |
+| Naïma Abdallah | naima.abdallah@reseau.km |
+| Youssouf Combo | youssouf.combo@reseau.km |
+| Mariam Halidi | mariam.halidi@reseau.km |
+| Iliasse Djae | iliasse.djae@reseau.km |
+
+> Se connecter avec l'un de ces comptes permet d'explorer immédiatement un profil complet avec points, formations inscrites, événements passés.
+
+---
+
+## PARTIE 10 — Tableaux de bord graphiques (admin)
+
+*Onglet admin — `http://laravel12pro.test/admin`*
+
+1. Se connecter : `admin@reseau.km` / `Admin@2026!`
+2. Arriver sur le **tableau de bord**
+3. Observer les 5 widgets affichés :
+
+| Widget | Type | Ce qu'il montre |
+|---|---|---|
+| **KPIs (en haut)** | Statistiques | Membres actifs, candidatures en attente, paiements à valider, recommandations ouvertes |
+| **Nouveaux membres** | Courbe (12 mois) | Évolution des nouvelles activations mois par mois |
+| **Paiements** | Barres groupées (6 mois) | Paiements en attente / validés / rejetés par mois |
+| **Répartition par secteur** | Donut (½ largeur) | Top 9 secteurs des membres actifs |
+| **Activité événements** | Barres horizontales (½ largeur) | Inscrits vs capacité sur les 6 derniers événements |
+
+> **À mentionner :** aucune dépendance externe — Chart.js est intégré nativement à Filament 3. Les données se mettent à jour en temps réel à chaque chargement de page.
+
+---
+
+## PARTIE 11 — Export de la liste des membres (admin)
+
+*Onglet admin → menu "Profils membres"*
+
+1. Cliquer sur **"Profils membres"** dans le menu gauche
+2. En haut à droite, cliquer sur le bouton **"Exporter ↓"** (icône flèche bleue)
+3. Un menu déroulant affiche 3 options :
+
+### Option A — Export CSV
+
+1. Cliquer sur **"Exporter en CSV"**
+2. Un modal s'ouvre avec un filtre statut
+3. Laisser **"Tous les membres"** → cliquer sur **"Exporter"**
+4. Le fichier `membres-2026-06-16.csv` se télécharge
+5. Ouvrir dans Excel ou LibreOffice Calc
+
+### Option B — Export Excel
+
+1. Cliquer sur **"Exporter en Excel (.xlsx)"**
+2. Sélectionner **"Actifs uniquement"** → cliquer sur **"Exporter"**
+3. Le fichier `membres-2026-06-16.xlsx` se télécharge
+4. Ouvrir : l'en-tête est sur fond bleu, les colonnes se dimensionnent automatiquement
+
+### Option C — Export PDF
+
+1. Cliquer sur **"Exporter en PDF"**
+2. Laisser le filtre sur "Tous les membres" → **"Exporter"**
+3. Le fichier `membres-2026-06-16.pdf` se télécharge
+4. Ouvrir : format A4 paysage, badges de statut colorés (vert = actif, rouge = suspendu…), compteurs en haut
+
+**Colonnes exportées :** Prénom, Nom, Email, Téléphone, Entreprise/Projet, Secteur, Ville, Statut, Adhésion, Expiration, Mentor, Code parrainage
+
+---
+
+## PARTIE 12 — Conformité RGPD
+
+### La bannière de consentement
+
+1. Ouvrir un navigateur en navigation privée (ou effacer le localStorage)
+2. Aller sur `http://laravel12pro.test/`
+3. En bas de page, la **bannière de consentement** apparaît
+4. Elle indique : *"Nous utilisons des cookies fonctionnels…"* avec un bouton **"J'accepte"**
+5. Cliquer sur **"J'accepte"** → la bannière disparaît avec une animation
+6. Rafraîchir la page → la bannière ne réapparaît plus (stockée dans `localStorage`)
+
+### La page RGPD
+
+1. Dans le footer de n'importe quelle page publique, repérer :
+   - Le badge vert **"Conforme RGPD 🛡"**
+   - Le lien **"Politique de confidentialité"**
+2. Cliquer sur le lien → page `/politique-de-confidentialite`
+3. La page couvre 10 sections :
+   - Responsable du traitement (coordonnées)
+   - Données collectées (tableau par catégorie)
+   - Finalités et base légale (4 cartes)
+   - Durées de conservation
+   - Partage des données
+   - Sécurité
+   - Cookies
+   - Droits des personnes (6 droits RGPD)
+   - Modifications
+
+> **À mettre en avant :** la page est entièrement en français, complète, et la bannière suit le modèle WordPress — familier pour le public cible.
+
+---
+
 ## Récapitulatif du scénario
 
 ```
@@ -375,7 +506,10 @@ Fatouma → Consulte sa progression & historique de points
 | **Gamification** | Points uniquement sur affiliés directs — pas de pyramide, conforme aux règles |
 | **Déclaratif** | Pas de paiement en ligne — adapté à la réalité comorienne (MVola, espèces) |
 | **Multiformat** | Présentiel, en ligne, hybride — adapté aux formateurs locaux et diaspora |
+| **Tableaux de bord** | 5 graphiques temps réel, aucune dépendance externe (Chart.js natif Filament) |
+| **Export membres** | CSV / Excel / PDF avec filtre statut, en un clic depuis l'admin |
+| **Conformité RGPD** | Bannière consentement + page complète 10 sections + badge footer |
 
 ---
 
-*Tutoriel de démonstration v1.0 — Réseau des Jeunes Entrepreneurs des Comores*
+*Tutoriel de démonstration v1.2 — Réseau des Jeunes Entrepreneurs des Comores*

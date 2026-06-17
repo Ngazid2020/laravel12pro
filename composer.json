@@ -14,6 +14,7 @@
         "laravel/sanctum": "^4.3",
         "laravel/tinker": "^2.10.1",
         "livewire/livewire": "^3.8",
+        "maatwebsite/excel": "^3.1",
         "robsontenorio/mary": "^2.8",
         "simplesoftwareio/simple-qrcode": "^4.2",
         "staudenmeir/laravel-adjacency-list": "^1.25"

@@ -11,6 +11,7 @@ use Filament\Forms\Form;
 use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
@@ -120,7 +121,10 @@ class CandidatureApplicationResource extends Resource
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
+                ActionGroup::make([
+
+                    Tables\Actions\ViewAction::make(),
+                ]),
                 Tables\Actions\Action::make('accept')
                     ->label('Accepter')
                     ->icon('heroicon-o-check')

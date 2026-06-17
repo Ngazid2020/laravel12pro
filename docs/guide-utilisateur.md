@@ -1,6 +1,6 @@
 # Guide d'utilisation — Réseau des Entrepreneurs des Comores
 
-> Version 1.0 · Juin 2026
+> Version 1.2 · Juin 2026
 
 ---
 
@@ -21,6 +21,9 @@
 13. [Mise en relation](#13-mise-en-relation)
 14. [Mon réseau](#14-mon-réseau)
 15. [Guide administrateur](#15-guide-administrateur)
+16. [Tableaux de bord graphiques](#16-tableaux-de-bord-graphiques)
+17. [Export des membres](#17-export-des-membres)
+18. [Politique de confidentialité (RGPD)](#18-rgpd)
 
 ---
 
@@ -574,4 +577,73 @@ php artisan queue:work --tries=3
 
 ---
 
-*Guide rédigé pour la version 1.0 de la plateforme — Réseau des Jeunes Entrepreneurs des Comores*
+---
+
+## 16. Tableaux de bord graphiques
+
+Le dashboard administrateur (`/admin`) affiche, sous les indicateurs clés, **4 graphiques interactifs** mis à jour en temps réel :
+
+| Graphique | Type | Données affichées |
+|---|---|---|
+| **Nouveaux membres actifs** | Courbe | Évolution mensuelle sur 12 mois |
+| **Paiements par statut** | Barres groupées | En attente / Validés / Rejetés sur 6 mois |
+| **Répartition par secteur** | Donut | Top 9 secteurs des membres actifs |
+| **Inscriptions par événement** | Barres horizontales | Inscrits vs Capacité pour les 6 derniers événements |
+
+Les graphiques utilisent Chart.js, intégré nativement à Filament — aucune installation supplémentaire.
+
+---
+
+## 17. Export des membres
+
+Depuis **`/admin/member-profiles`**, le bouton **"Exporter ↓"** (haut à droite) permet de télécharger la liste des membres en trois formats.
+
+### Formats disponibles
+
+| Format | Extension | Caractéristiques |
+|---|---|---|
+| **CSV** | `.csv` | Compatible Excel, LibreOffice, Google Sheets |
+| **Excel** | `.xlsx` | En-tête bleu, colonnes auto-dimensionnées, prêt à imprimer |
+| **PDF** | `.pdf` | A4 paysage, badges de statut colorés, compteurs par catégorie |
+
+### Utilisation
+
+1. Cliquez sur **"Exporter ↓"**
+2. Choisissez le format souhaité
+3. Une fenêtre s'ouvre avec un filtre **"Statut"** :
+   - Tous les membres
+   - Actifs uniquement
+   - Candidats / Suspendus / Exclus / Alumni
+4. Cliquez sur **"Exporter"** — le fichier se télécharge automatiquement
+
+### Colonnes exportées
+
+Prénom · Nom · Email · Téléphone · Entreprise/Projet · Secteur · Ville · Statut · Date d'adhésion · Expiration · Mentor · Code de parrainage
+
+---
+
+## 18. Politique de confidentialité (RGPD)
+
+### Pour les visiteurs
+
+La page **`/politique-de-confidentialite`** détaille en 10 sections :
+- Les données collectées et leur finalité
+- La base légale de chaque traitement
+- Les durées de conservation
+- Les droits des utilisateurs (accès, rectification, effacement, portabilité…)
+- Les mesures de sécurité mises en place
+- La politique en matière de cookies (session uniquement, aucun traceur publicitaire)
+
+Un lien vers cette page est présent dans le **footer de toutes les pages publiques**.
+
+### Bannière de consentement
+
+À la première visite, une bannière apparaît en bas de page. Elle disparaît après clic sur **"J'accepte"** et ne se réaffiche plus (mémorisée via `localStorage`).
+
+### Contact RGPD
+
+Pour exercer vos droits : **contact@reseau-entrepreneurs.km** (réponse sous 30 jours).
+
+---
+
+*Guide rédigé pour la version 1.2 de la plateforme — Réseau des Jeunes Entrepreneurs des Comores*

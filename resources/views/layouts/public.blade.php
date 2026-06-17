@@ -16,8 +16,21 @@
         <span class="font-light ml-1 hidden sm:inline">Entrepreneurs</span>
     </x-slot:brand>
     <x-slot:actions>
-        <a href="{{ route('member.login') }}" class="btn btn-ghost btn-sm">Se connecter</a>
-        <a href="#postuler" class="btn btn-primary btn-sm">Rejoindre</a>
+        @auth
+            <div class="flex items-center gap-2">
+                <div class="flex items-center gap-1.5 text-sm text-base-content/70">
+                    <x-icon name="o-user-circle" class="w-5 h-5 text-primary" />
+                    <span class="hidden sm:inline font-medium">{{ auth()->user()->first_name }}</span>
+                </div>
+                <a href="{{ route('portail') }}" class="btn btn-primary btn-sm gap-1">
+                    <x-icon name="o-squares-2x2" class="w-4 h-4" />
+                    Mon espace
+                </a>
+            </div>
+        @else
+            <a href="{{ route('member.login') }}" class="btn btn-ghost btn-sm">Se connecter</a>
+            <a href="#postuler" class="btn btn-primary btn-sm">Rejoindre</a>
+        @endauth
     </x-slot:actions>
 </x-nav>
 
