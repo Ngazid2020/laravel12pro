@@ -219,7 +219,7 @@
              wire:ignore>
             <div id="oc-chart" class="oc-tree" data-tree="{{ json_encode($treeJson) }}"></div>
 
-            {{-- Boutons zoom/recentrer --}}
+            {{-- Boutons zoom/recentrer/exporter --}}
             <div class="absolute bottom-3 right-3 flex gap-1 z-20">
                 <button onclick="window.ocZoom(.12)"
                         class="w-8 h-8 bg-white shadow rounded-lg flex items-center justify-center text-lg font-bold text-slate-500 hover:bg-slate-50 select-none">+</button>
@@ -229,6 +229,11 @@
                         class="w-8 h-8 bg-white shadow rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50 select-none"
                         title="Recentrer">
                     <x-icon name="o-arrows-pointing-in" class="w-4 h-4" />
+                </button>
+                <button onclick="window.ocExport(this)"
+                        class="w-8 h-8 bg-white shadow rounded-lg flex items-center justify-center text-slate-500 hover:bg-slate-50 disabled:opacity-40 select-none"
+                        title="Télécharger en PNG">
+                    <x-icon name="o-arrow-down-tray" class="w-4 h-4" />
                 </button>
             </div>
         </div>

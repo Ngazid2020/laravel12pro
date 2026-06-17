@@ -90,9 +90,20 @@
                         @endif
                     </div>
                 </div>
-                <span class="badge {{ $statusColors[$req->status] ?? 'badge-ghost' }} badge-sm">
-                    {{ $statusLabels[$req->status] ?? $req->status }}
-                </span>
+                <div class="flex items-center gap-2">
+                    <span class="badge {{ $statusColors[$req->status] ?? 'badge-ghost' }} badge-sm">
+                        {{ $statusLabels[$req->status] ?? $req->status }}
+                    </span>
+                    @if($req->status === 'pending')
+                        <x-button
+                            icon="o-x-mark"
+                            class="btn-ghost btn-xs text-error"
+                            title="Annuler la demande"
+                            wire:click="cancel({{ $req->id }})"
+                            wire:confirm="Annuler cette demande de mise en relation ?"
+                        />
+                    @endif
+                </div>
             </div>
         @empty
             <p class="text-sm text-base-content/50 italic">Aucune demande envoyée.</p>

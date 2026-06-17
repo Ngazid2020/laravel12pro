@@ -1,14 +1,15 @@
 /**
- * Org Chart — initialisation appelée depuis Alpine x-init
- * Aucun conflit Livewire : la fonction est définie dans le bundle Vite,
- * pas dans un script inline évalué par Livewire/Alpine.
+ * Org Chart — Arbre de mentorat
+ * Initialisation via window.initOrgChart(containerEl)
+ * Appelé depuis Alpine x-init après que Livewire a mis à jour le DOM.
  */
+import domtoimage from 'dom-to-image-more';
+
 (function () {
 
     function initOrgChart(containerEl) {
         if (!containerEl) return;
 
-        // Nettoyage d'une instance précédente (listeners window)
         if (typeof containerEl._ocCleanup === 'function') {
             containerEl._ocCleanup();
         }
@@ -23,7 +24,6 @@
         try { DATA = JSON.parse(raw); } catch (e) { return; }
         if (!DATA || typeof DATA !== 'object') return;
 
-        // Vide le contenu précédent
         chartEl.innerHTML = '';
 
         var scale = 1, px = 0, py = 0;
@@ -111,13 +111,57 @@
             applyTransform();
         }
 
-        // Double rAF : garantit que le navigateur a calculé le layout
         requestAnimationFrame(function () { requestAnimationFrame(center); });
 
-        /* ── API stockée sur l'élément (pas de globaux supplémentaires) ── */
+        /* ── Export PNG ──
+         *  dom-to-image-more délègue le rendu au moteur SVG natif du navigateur :
+         *  il n'analyse jamais les fonctions CSS (oklch, etc.), contrairement à html2canvas.
+         *  On clone rootUl sans transform dans un wrapper hors-écran, on capture, on nettoie.
+         */
+        function downloadPng(btnEl) {
+            if (btnEl) { btnEl.disabled = true; }
+
+            // Wrapper hors-écran avec le fond et le padding voulus
+            var wrap = document.createElement('div');
+            wrap.style.cssText = [
+                'display:inline-block',
+                'padding:40px',
+                'background:#f8fafc',
+                'position:absolute',
+                'left:-99999px',
+                'top:0',
+            ].join(';');
+
+            // Clone de l'arbre complet, sans transform
+            var clone = rootUl.cloneNode(true);
+            clone.style.transform       = 'none';
+            clone.style.transformOrigin = 'initial';
+            wrap.appendChild(clone);
+            document.body.appendChild(wrap);
+
+            domtoimage.toPng(wrap, { bgcolor: '#f8fafc', scale: 2 })
+                .then(function (dataUrl) {
+                    document.body.removeChild(wrap);
+                    if (btnEl) { btnEl.disabled = false; }
+
+                    var a = document.createElement('a');
+                    a.download = 'organigramme-mentorat.png';
+                    a.href     = dataUrl;
+                    a.click();
+                })
+                .catch(function (err) {
+                    if (document.body.contains(wrap)) { document.body.removeChild(wrap); }
+                    if (btnEl) { btnEl.disabled = false; }
+                    console.error('[OC Export]', err);
+                    alert('Export échoué : ' + (err && err.message ? err.message : err));
+                });
+        }
+
+        /* ── API stockée sur l'élément ── */
         containerEl._ocApi = {
-            zoom:  function (d) { scale = Math.max(.3, Math.min(scale + d, 2.5)); applyTransform(); },
-            reset: function ()  { scale = 1; center(); }
+            zoom:     function (d) { scale = Math.max(.3, Math.min(scale + d, 2.5)); applyTransform(); },
+            reset:    function ()  { scale = 1; center(); },
+            download: downloadPng,
         };
 
         /* ── Pan souris ── */
@@ -153,7 +197,7 @@
             applyTransform();
         }, { passive: false });
 
-        /* ── Nettoyage (supprime les listeners window à la destruction) ── */
+        /* ── Nettoyage ── */
         containerEl._ocCleanup = function () {
             window.removeEventListener('mouseup',   onUp);
             window.removeEventListener('mousemove', onMove);
@@ -162,10 +206,9 @@
         };
     }
 
-    /* ── Exports globaux ── */
+    /* ── Globaux appelés depuis les boutons HTML ── */
     window.initOrgChart = initOrgChart;
 
-    // Boutons zoom/reset dans le HTML appellent ces deux fonctions
     window.ocZoom = function (d) {
         var c = document.getElementById('oc-container');
         if (c && c._ocApi) c._ocApi.zoom(d);
@@ -173,6 +216,11 @@
     window.ocReset = function () {
         var c = document.getElementById('oc-container');
         if (c && c._ocApi) c._ocApi.reset();
+    };
+    window.ocExport = function (btnEl) {
+        var c = document.getElementById('oc-container');
+        if (c && c._ocApi) c._ocApi.download(btnEl);
+        else alert('Le chart n\'est pas encore initialisé.');
     };
 
 }());

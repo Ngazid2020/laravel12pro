@@ -4,6 +4,7 @@ namespace App\Livewire\Member;
 
 use App\Models\ContactRequest;
 use App\Models\User;
+use App\Notifications\ContactRequestReceived;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
@@ -36,12 +37,16 @@ class Contacts extends Component
             return;
         }
 
-        ContactRequest::create([
+        $cr = ContactRequest::create([
             'sender_id'   => Auth::id(),
             'receiver_id' => $this->receiverId,
             'message'     => $this->message ?: null,
             'status'      => 'pending',
         ]);
+
+        // Notifie le destinataire (in-app + email)
+        $cr->setRelation('sender', Auth::user());
+        User::find($this->receiverId)?->notify(new ContactRequestReceived($cr));
 
         $this->reset(['showForm', 'receiverId', 'message']);
         $this->success('Demande de mise en relation envoyée.');
@@ -63,6 +68,16 @@ class Contacts extends Component
             ->update(['status' => 'declined']);
 
         $this->info('Demande refusée.');
+    }
+
+    public function cancel(int $requestId): void
+    {
+        ContactRequest::where('id', $requestId)
+            ->where('sender_id', Auth::id())
+            ->where('status', 'pending')
+            ->delete();
+
+        $this->info('Demande annulée.');
     }
 
     public function render()

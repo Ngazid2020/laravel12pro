@@ -106,6 +106,13 @@
 
     {{-- Contenu principal --}}
     <x-slot:content>
+        {{-- Barre notifications --}}
+        @auth
+        <div class="flex justify-end px-4 pt-3 pb-0">
+            <livewire:member.notification-bell />
+        </div>
+        @endauth
+
         {{-- Alerte suspension / warning flash --}}
         @if(session('warning'))
             <div class="alert alert-warning mb-4 mx-4 mt-4">
