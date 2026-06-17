@@ -25,9 +25,30 @@
         </x-slot:title>
 
         @if(!$hasMentor)
-            <x-alert icon="o-information-circle" class="alert-info">
-                Vous n'avez pas encore de mentor assigné. Contactez l'administration pour être mis en relation.
-            </x-alert>
+            @if($pendingMentorRequest)
+                <x-alert icon="o-clock" class="alert-warning">
+                    <div>
+                        <p class="font-semibold">Demande de mentorat en attente de validation</p>
+                        <p class="text-sm mt-0.5">
+                            Vous avez demandé à
+                            <strong>{{ $pendingMentorRequest->mentor->name }}</strong>
+                            comme mentor. L'administration traitera votre demande prochainement.
+                        </p>
+                    </div>
+                </x-alert>
+            @else
+                <x-alert icon="o-information-circle" class="alert-info">
+                    Vous n'avez pas encore de mentor assigné.
+                </x-alert>
+                <div class="mt-3">
+                    <x-button
+                        label="Demander un mentor"
+                        icon="o-academic-cap"
+                        class="btn-primary btn-sm"
+                        wire:click="$set('showMentorRequest', true)"
+                    />
+                </div>
+            @endif
         @else
             <div class="mb-3">
                 <x-button
@@ -259,6 +280,31 @@
     </x-card>
 
     @endif {{-- /organigramme --}}
+
+    {{-- Modal demande de mentor --}}
+    <x-modal wire:model="showMentorRequest" title="Demander un mentor" class="backdrop-blur">
+        <x-form wire:submit="submitMentorRequest">
+            <x-select
+                label="Choisir un mentor"
+                wire:model="mentorRequestTargetId"
+                :options="$availableMentors->map(fn($m) => ['id' => $m->id, 'name' => $m->name])->toArray()"
+                option-value="id"
+                option-label="name"
+                placeholder="Sélectionner un membre actif…"
+                required
+            />
+            <x-textarea
+                label="Message (optionnel)"
+                wire:model="mentorRequestMessage"
+                rows="3"
+                placeholder="Présentez-vous et expliquez pourquoi vous souhaitez ce mentor…"
+            />
+            <x-slot:actions>
+                <x-button label="Annuler" wire:click="$set('showMentorRequest', false)" class="btn-ghost" />
+                <x-button label="Envoyer la demande" type="submit" class="btn-primary" />
+            </x-slot:actions>
+        </x-form>
+    </x-modal>
 
     {{-- Modal demande de session --}}
     <x-modal wire:model="showRequest" title="Demander une session de mentorat" class="backdrop-blur">

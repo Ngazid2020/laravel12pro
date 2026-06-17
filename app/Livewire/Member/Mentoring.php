@@ -3,7 +3,9 @@
 namespace App\Livewire\Member;
 
 use App\Models\MemberProfile;
+use App\Models\MentoringRequest;
 use App\Models\MentoringSession;
+use App\Models\User;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
@@ -29,6 +31,13 @@ class Mentoring extends Component
     public bool   $showNotes      = false;
     public ?int   $notesSessionId = null;
     public string $sessionNotes   = '';
+
+    // Demande de mentor
+    public bool   $showMentorRequest       = false;
+    public ?int   $mentorRequestTargetId   = null;
+    public string $mentorRequestMessage    = '';
+
+    // ── Demande de session ────────────────────────────────────────────────────
 
     protected function rulesRequest(): array
     {
@@ -92,6 +101,44 @@ class Mentoring extends Component
         $this->success('Notes enregistrées.');
     }
 
+    // ── Demande de mentor ─────────────────────────────────────────────────────
+
+    public function submitMentorRequest(): void
+    {
+        $this->validate([
+            'mentorRequestTargetId' => 'required|exists:users,id|different:'.Auth::id(),
+            'mentorRequestMessage'  => 'nullable|string|max:500',
+        ]);
+
+        $user = Auth::user();
+
+        if ($user->profile?->mentor_id) {
+            $this->error('Vous avez déjà un mentor assigné.');
+            return;
+        }
+
+        $already = MentoringRequest::where('requester_id', $user->id)
+            ->where('mentor_id', $this->mentorRequestTargetId)
+            ->exists();
+
+        if ($already) {
+            $this->warning('Vous avez déjà envoyé une demande à ce membre.');
+            return;
+        }
+
+        MentoringRequest::create([
+            'requester_id' => $user->id,
+            'mentor_id'    => $this->mentorRequestTargetId,
+            'message'      => $this->mentorRequestMessage ?: null,
+            'status'       => 'pending',
+        ]);
+
+        $this->reset(['showMentorRequest', 'mentorRequestTargetId', 'mentorRequestMessage']);
+        $this->success('Votre demande a été envoyée. L\'administration la traitera prochainement.');
+    }
+
+    // ── Rendu ─────────────────────────────────────────────────────────────────
+
     public function render()
     {
         $user = Auth::user();
@@ -124,7 +171,29 @@ class Mentoring extends Component
             'cancelled' => 'badge-error',
         ];
 
-        // ── Organigramme (calculé uniquement quand l'onglet est actif) ──
+        // ── Données pour la demande de mentor (si pas encore de mentor) ──
+        $availableMentors     = collect();
+        $pendingMentorRequest = null;
+
+        if (!$hasMentor) {
+            $pendingMentorRequest = MentoringRequest::where('requester_id', $user->id)
+                ->where('status', 'pending')
+                ->with('mentor')
+                ->first();
+
+            // Liste des mentors disponibles (excluant déjà demandés ou approuvés)
+            $alreadyRequestedIds = MentoringRequest::where('requester_id', $user->id)
+                ->pluck('mentor_id')
+                ->toArray();
+
+            $availableMentors = User::whereHas('profile', fn ($q) => $q->where('membership_status', 'active'))
+                ->where('id', '!=', $user->id)
+                ->whereNotIn('id', $alreadyRequestedIds)
+                ->orderBy('name')
+                ->get(['id', 'name']);
+        }
+
+        // ── Organigramme ──
         $treeJson  = null;
         $activeTab = $this->activeTab;
 
@@ -133,7 +202,6 @@ class Mentoring extends Component
             $descendants = $profile->descendants()->with('user')->get();
             $tree        = $this->buildOrgData($profile, $descendants, $user->id, 0);
 
-            // Si le membre a un mentor, on le place à la racine
             if ($profile->mentor_id) {
                 $mp = MemberProfile::where('user_id', $profile->mentor_id)->with('user')->first();
                 if ($mp) {
@@ -157,7 +225,8 @@ class Mentoring extends Component
 
         return view('livewire.member.mentoring', compact(
             'activeTab', 'menteeSessions', 'mentorSessions', 'hasMentor', 'isMentor',
-            'statusLabels', 'statusColors', 'treeJson'
+            'statusLabels', 'statusColors', 'treeJson',
+            'availableMentors', 'pendingMentorRequest'
         ));
     }
 

@@ -39,21 +39,37 @@
         {{-- Liste --}}
         <div class="divide-y divide-base-200/60 max-h-96 overflow-y-auto">
             @forelse($notifications as $notif)
-                @php $data = $notif->data; $isUnread = is_null($notif->read_at); @endphp
+                @php
+                    $data        = $notif->data;
+                    $isUnread    = is_null($notif->read_at);
+                    $isMentoring = ($data['type'] ?? '') === 'mentoring_request_reviewed';
+                    $notifIcon   = $isMentoring ? 'o-academic-cap' : 'o-user-plus';
+                @endphp
                 <div class="px-4 py-3 {{ $isUnread ? 'bg-primary/5' : '' }} hover:bg-base-200/60 transition-colors">
                     <div class="flex gap-3 items-start">
                         <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
-                            <x-icon name="o-user-plus" class="w-4 h-4 text-primary" />
+                            <x-icon :name="$notifIcon" class="w-4 h-4 text-primary" />
                         </div>
                         <div class="flex-1 min-w-0">
-                            <p class="text-sm leading-snug">
-                                <span class="font-semibold">{{ $data['sender_name'] ?? '?' }}</span>
-                                souhaite se mettre en relation avec vous
-                            </p>
-                            @if(!empty($data['message']))
-                                <p class="text-xs text-base-content/50 mt-0.5 truncate">
-                                    « {{ $data['message'] }} »
+                            @if($isMentoring)
+                                <p class="text-sm leading-snug">
+                                    Votre demande de mentorat avec
+                                    <span class="font-semibold">{{ $data['mentor_name'] ?? '?' }}</span>
+                                    a été
+                                    <span class="{{ ($data['status'] ?? '') === 'approved' ? 'text-success font-semibold' : 'text-error' }}">
+                                        {{ ($data['status'] ?? '') === 'approved' ? 'approuvée ✓' : 'refusée' }}
+                                    </span>
                                 </p>
+                            @else
+                                <p class="text-sm leading-snug">
+                                    <span class="font-semibold">{{ $data['sender_name'] ?? '?' }}</span>
+                                    souhaite se mettre en relation avec vous
+                                </p>
+                                @if(!empty($data['message']))
+                                    <p class="text-xs text-base-content/50 mt-0.5 truncate">
+                                        « {{ $data['message'] }} »
+                                    </p>
+                                @endif
                             @endif
                             <p class="text-xs text-base-content/40 mt-1">
                                 {{ $notif->created_at->diffForHumans() }}

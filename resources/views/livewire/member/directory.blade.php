@@ -85,6 +85,25 @@
                             @endif
                         </div>
                     @endif
+
+                    @if(!$hasMentor)
+                        <div class="mt-3 pt-3 border-t border-base-200">
+                            @if(in_array($profile->user_id, $pendingMentorRequestIds))
+                                <button disabled
+                                        class="btn btn-xs btn-ghost text-warning w-full cursor-default">
+                                    <x-icon name="o-clock" class="w-3.5 h-3.5" />
+                                    Demande envoyée
+                                </button>
+                            @else
+                                <button wire:click="requestMentor({{ $profile->user_id }})"
+                                        wire:confirm="Envoyer une demande de mentorat à {{ $profile->user->name }} ?"
+                                        class="btn btn-xs btn-outline btn-primary w-full">
+                                    <x-icon name="o-academic-cap" class="w-3.5 h-3.5" />
+                                    Demander comme mentor
+                                </button>
+                            @endif
+                        </div>
+                    @endif
                 </x-card>
             @endforeach
         </div>
